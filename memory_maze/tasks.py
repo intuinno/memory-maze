@@ -69,12 +69,14 @@ def _memory_maze(
     randomize_colors=False,
     walker_str="ball",
     remap_obs=True,
+    bonus_time_limit=0,
 ):
     random_state = np.random.RandomState(seed)
     if walker_str == "ball":
         walker = RollingBallWithFriction(camera_height=0.3, add_ears=top_camera)
     elif walker_str == "ant":
-        walker = Ant(observable_option={"egocentric_camera": dict(enabled=True)})
+        # walker = Ant(observable_option={"egocentric_camera": dict(enabled=True)})
+        walker = Ant()
     else:
         raise NotImplementedError
     arena = MazeWithTargetsArena(
@@ -106,7 +108,7 @@ def _memory_maze(
         n_targets=n_targets,
         target_radius=0.6,
         target_height_above_ground=0.5 if good_visibility else -0.6,
-        enable_global_task_observables=True,  # Always add to underlying env, but not always expose in RemapObservationWrapper
+        enable_global_task_observables=False,  # Removed due to maze_layout
         control_timestep=1.0 / control_freq,
         camera_resolution=camera_resolution,
         target_randomize_colors=randomize_colors,
@@ -115,8 +117,10 @@ def _memory_maze(
     if top_camera:
         task.observables["top_camera"].enabled = True
 
+    total_time_limit = time_limit + bonus_time_limit
+
     env = composer.Environment(
-        time_limit=time_limit
+        time_limit=total_time_limit
         - 1e-3,  # subtract epsilon to make sure ep_length=time_limit*fps
         task=task,
         random_state=random_state,

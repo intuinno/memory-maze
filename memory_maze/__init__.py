@@ -168,13 +168,13 @@ try:
             entry_point=f(
                 _make_gym_env,
                 dm_task,
-                global_observables=True,
+                # global_observables=True,
                 control_freq=20,
-                walker="ant",
+                walker_str="ant",
                 discrete_actions=False,
                 target_color_in_image=False,
                 remap_obs=False,
-                time_limit=100000000000,
+                bonus_time_limit=100000000000,
             ),
         )
 
