@@ -133,6 +133,15 @@ Dict(
 
 We also register [additional variants](memory_maze/__init__.py) of the environment that can be useful in certain scenarios.
 
+## Walker types
+
+Default agent is jumping ball with discrete actions. You can use ant walker by using 
+
+```python
+>>> env = gym.make('memory_maze:MemoryMaze-9x9-Ant-v0')
+```
+
+
 ## DeepMind Interface
 
 You can create the environment using the [dm_env](https://github.com/deepmind/dm_env) interface:
