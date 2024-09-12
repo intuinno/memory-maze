@@ -6,6 +6,7 @@ from memory_maze.maze import *
 from memory_maze.oracle import DrawMinimapWrapper, PathToTargetWrapper
 from memory_maze.wrappers import *
 from dm_control.locomotion.walkers.ant import Ant
+from memory_maze.joe import Joe
 
 
 # Slow control (4Hz), so that agent without HRL has a chance.
@@ -77,6 +78,9 @@ def _memory_maze(
     elif walker_str == "ant":
         # walker = Ant(observable_option={"egocentric_camera": dict(enabled=True)})
         walker = Ant()
+    elif walker_str == "joe":
+        # walker = Joe(observable_option={"egocentric_camera": dict(enabled=True)})
+        walker = Joe()
     else:
         raise NotImplementedError
     arena = MazeWithTargetsArena(

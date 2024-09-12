@@ -178,6 +178,22 @@ try:
             ),
         )
 
+        # Joe agent
+        register(
+            id=f"MemoryMaze-{key}-Joe-v0",
+            entry_point=f(
+                _make_gym_env,
+                dm_task,
+                # global_observables=True,
+                control_freq=20,
+                walker_str="joe",
+                discrete_actions=False,
+                target_color_in_image=False,
+                remap_obs=False,
+                bonus_time_limit=100000000000,
+            ),
+        )
+
 
 except ImportError:
     print("memory_maze: gym environments not registered.")
