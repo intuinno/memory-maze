@@ -23,8 +23,8 @@ https://opensource.org/licenses/MIT.
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2" />
   </asset>
   <worldbody>
-    <!-- <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3" /> -->
-    <!-- <light name="spotlight" mode="targetbodycom" target="torso" diffuse="0.8 .8 .8"
+    <!-- <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3" />
+    <light name="spotlight" mode="targetbodycom" target="torso" diffuse="0.8 .8 .8"
       specular=".3 .3 .3" pos="0 -6 4" cutoff="30" /> -->
     <camera name="sideon" pos="0 -10 5" fovy="45" mode="targetbody" target="torso" />
     <camera name="float_far" pos="-4 0 2" xyaxes="0 -1 0 .5 0 1" mode="trackcom" fovy="90" />
@@ -61,7 +61,7 @@ https://opensource.org/licenses/MIT.
           <joint name="neck_z" axis="0 0 1" range="-60 60" />
           <camera name="egocentric" pos="0 .3 0" xyaxes="1 0 0 0 0 1" fovy="90" />
           <geom name="head_geom" type="capsule" size="0.08" fromto="0 0 0 0 0.20 0" />
-          <body name="rangefinder" pos="0 -0.1 -0.1" euler="0 0 90">
+          <body name="rangefinder" pos="0 0 -0.1" euler="0 0 90">
             <site name="rf_00" class="rangefinder" fromto=".41 -.02  .11 .34 0 .115" />
             <site name="rf_01" class="rangefinder" fromto=".41 -.01  .11 .34 0 .115" />
             <site name="rf_02" class="rangefinder" fromto=".41   0   .11 .34 0 .115" />
@@ -87,8 +87,8 @@ https://opensource.org/licenses/MIT.
       </body>
       <body name="front_left_leg" pos="0.2 0.2 0">
         <joint name="front_left_hip_x" axis="1 0 0" range="-60 60" />
-        <joint name="front_left_hip_z" axis="0 0 1" range="-60 60" />
         <joint name="front_left_hip_y" axis="0 1 0" range="-60 60" />
+        <joint name="front_left_hip_z" axis="0 0 1" range="-60 60" />
         <geom name="front_left_leg_geom" type="capsule" size="0.04" fromto="0.0 0.0 0.0 0.3 0.0 0.0" />
         <site name="front_left_leg_touch" type="capsule" size="0.05" fromto="0 0 0 0.3 0 0"
           rgba="1 1 0 0" />
@@ -101,9 +101,9 @@ https://opensource.org/licenses/MIT.
         </body>
       </body>
       <body name="front_right_leg" pos="-0.2 0.2 0">
-        <joint name="front_right_hip_z" axis="0 0 1" range="-60 60" />
         <joint name="front_right_hip_x" axis="1 0 0" range="-60 60" />
         <joint name="front_right_hip_y" axis="0 1 0" range="-60 60" />
+        <joint name="front_right_hip_z" axis="0 0 1" range="-60 60" />
         <geom name="front_right_leg_geom" type="capsule" size="0.04"
           fromto="0.0 0.0 0.0 -0.3 0.0 0.0" />
         <site name="front_right_leg_touch" type="capsule" size="0.05" fromto="0 0 0 -0.3 0 0"
@@ -118,9 +118,9 @@ https://opensource.org/licenses/MIT.
       </body>
 
       <body name="back_left_leg" pos="0.2 -0.2 0">
-        <joint name="back_left_hip_z" axis="0 0 1" range="-60 60" />
         <joint name="back_left_hip_x" axis="1 0 0" range="-60 60" />
         <joint name="back_left_hip_y" axis="0 1 0" range="-60 60" />
+        <joint name="back_left_hip_z" axis="0 0 1" range="-60 60" />
         <geom name="back_left_leg_geom" type="capsule" size="0.04" fromto="0.0 0.0 0.0 0.3 0.0 0.0" />
         <site name="back_left_leg_touch" type="capsule" size="0.05" fromto="0 0 0 0.3 0 0"
           rgba="1 1 0 0" />
@@ -133,9 +133,9 @@ https://opensource.org/licenses/MIT.
       </body>
 
       <body name="back_right_leg" pos="-0.2 -0.2 0">
-        <joint name="back_right_hip_z" axis="0 0 1" range="-60 60" />
         <joint name="back_right_hip_x" axis="1 0 0" range="-60 60" />
         <joint name="back_right_hip_y" axis="0 1 0" range="-60 60" />
+        <joint name="back_right_hip_z" axis="0 0 1" range="-60 60" />
         <geom name="back_right_leg_geom" type="capsule" size="0.04"
           fromto="0.0 0.0 0.0 -0.3 0.0 0.0" />
         <site name="back_right_leg_touch" type="capsule" size="0.05" fromto="0 0 0 -0.3 0 0"
@@ -154,22 +154,25 @@ https://opensource.org/licenses/MIT.
   </worldbody>
 
   <actuator>
+    <motor name="front_left_hip_x" joint="front_left_hip_x" />
     <motor name="front_left_hip_y" joint="front_left_hip_y" />
     <motor name="front_left_hip_z" joint="front_left_hip_z" />
-    <motor name="front_left_hip_x" joint="front_left_hip_x" />
     <motor name="front_left_ankle" joint="front_left_ankle" />
+    <motor name="front_right_hip_x" joint="front_right_hip_x" />
     <motor name="front_right_hip_y" joint="front_right_hip_y" />
     <motor name="front_right_hip_z" joint="front_right_hip_z" />
-    <motor name="front_right_hip_x" joint="front_right_hip_x" />
     <motor name="front_right_ankle" joint="front_right_ankle" />
+    <motor name="back_left_hip_x" joint="back_left_hip_x" />
     <motor name="back_left_hip_y" joint="back_left_hip_y" />
     <motor name="back_left_hip_z" joint="back_left_hip_z" />
-    <motor name="back_left_hip_x" joint="back_left_hip_x" />
     <motor name="back_left_ankle" joint="back_left_ankle" />
+    <motor name="back_right_hip_x" joint="back_right_hip_x" />
     <motor name="back_right_hip_y" joint="back_right_hip_y" />
     <motor name="back_right_hip_z" joint="back_right_hip_z" />
-    <motor name="back_right_hip_x" joint="back_right_hip_x" />
     <motor name="back_right_ankle" joint="back_right_ankle" />
+    <motor name="neck_x" joint="neck_x" />
+    <motor name="neck_y" joint="neck_y" />
+    <motor name="neck_z" joint="neck_z" />
   </actuator>
 
   <sensor>
@@ -182,6 +185,23 @@ https://opensource.org/licenses/MIT.
     <touch name="back_left_ankle_touch" site="back_left_ankle_touch" />
     <touch name="back_right_leg_touch" site="back_right_leg_touch" />
     <touch name="back_right_ankle_touch" site="back_right_ankle_touch" />
+
+    <torque name="front_left_leg_torque" site="front_left_leg_touch" />
+    <torque name="front_left_ankle_torque" site="front_left_ankle_touch" />
+    <torque name="front_right_leg_torque" site="front_right_leg_touch" />
+    <torque name="front_right_ankle_torque" site="front_right_ankle_touch" />
+    <torque name="back_left_leg_torque" site="back_left_leg_touch" />
+    <torque name="back_left_ankle_torque" site="back_left_ankle_touch" />
+    <torque name="back_right_leg_torque" site="back_right_leg_touch" />
+    <torque name="back_right_ankle_torque" site="back_right_ankle_touch" />
+    <force name="front_left_leg_force" site="front_left_leg_touch" />
+    <force name="front_left_ankle_force" site="front_left_ankle_touch" />
+    <force name="front_right_leg_force" site="front_right_leg_touch" />
+    <force name="front_right_ankle_force" site="front_right_ankle_touch" />
+    <force name="back_left_leg_force" site="back_left_leg_touch" />
+    <force name="back_left_ankle_force" site="back_left_ankle_touch" />
+    <force name="back_right_leg_force" site="back_right_leg_touch" />
+    <force name="back_right_ankle_force" site="back_right_ankle_touch" />
     <velocimeter name="torso_vel" site="torso_site" />
     <gyro name="torso_gyro" site="torso_site" />
     <accelerometer name="torso_accel" site="torso_site" />

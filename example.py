@@ -19,7 +19,9 @@ def main(unused_argv):
     gym_env = gym.make("memory_maze:MemoryMaze-15x15-Joe-v0")
     print("observation space\n", gym_env.observation_space)
     print("action_space\n", gym_env.action_space)
-    viewer.launch(environment_loader=env)
+    obs = gym_env.reset()
+
+    # viewer.launch(environment_loader=env)
 
 
 if __name__ == "__main__":
