@@ -1,4 +1,5 @@
 .*
+*.npz
 !.gitignore
 
 __pycache__/

@@ -78,10 +78,14 @@ def _memory_maze(
         room_max_size=room_max_size,
         spawns_per_room=1,
         targets_per_room=1,
-        floor_textures=FixedFloorTexture('style_01', ['blue', 'blue_bright']),
-        wall_textures=dict({
-            '*': FixedWallTexture('style_01', 'yellow'),  # default wall
-        }, **{str(i): labmaze_textures.WallTextures('style_01') for i in range(10)}  # variations
+        floor_textures=FixedFloorTexture("style_01", ["blue", "blue_bright"]),
+        wall_textures=dict(
+            {
+                "*": FixedWallTexture("style_01", "yellow"),  # default wall
+            },
+            **{
+                str(i): labmaze_textures.WallTextures("style_01") for i in range(10)
+            }  # variations
         ),
         skybox_texture=None,
         random_seed=random_state.randint(2147483648),
@@ -100,31 +104,50 @@ def _memory_maze(
     )
 
     if top_camera:
-        task.observables['top_camera'].enabled = True
+        task.observables["top_camera"].enabled = True
 
     env = composer.Environment(
-        time_limit=time_limit - 1e-3,  # subtract epsilon to make sure ep_length=time_limit*fps
+        time_limit=time_limit
+        - 1e-3,  # subtract epsilon to make sure ep_length=time_limit*fps
         task=task,
         random_state=random_state,
-        strip_singleton_obs_buffer_dim=True)
+        strip_singleton_obs_buffer_dim=True,
+    )
 
     obs_mapping = {
-        'image': 'walker/egocentric_camera' if not top_camera else 'top_camera',
-        'target_color': 'target_color',
+        "image": "walker/egocentric_camera" if not top_camera else "top_camera",
+        "target_color": "target_color",
     }
+
+    if top_camera:
+        obs_mapping["top_image"] = "top_camera"
+
     if global_observables:
-        env = TargetsPositionWrapper(env, task._maze_arena.xy_scale, task._maze_arena.maze.width, task._maze_arena.maze.height)
-        env = AgentPositionWrapper(env, task._maze_arena.xy_scale, task._maze_arena.maze.width, task._maze_arena.maze.height)
+        env = TargetsPositionWrapper(
+            env,
+            task._maze_arena.xy_scale,
+            task._maze_arena.maze.width,
+            task._maze_arena.maze.height,
+        )
+        env = AgentPositionWrapper(
+            env,
+            task._maze_arena.xy_scale,
+            task._maze_arena.maze.width,
+            task._maze_arena.maze.height,
+        )
         env = MazeLayoutWrapper(env)
-        obs_mapping = dict(obs_mapping, **{
-            'agent_pos': 'agent_pos',
-            'agent_dir': 'agent_dir',
-            'targets_vec': 'targets_vec',
-            'targets_pos': 'targets_pos',
-            'target_vec': 'target_vec',
-            'target_pos': 'target_pos',
-            'maze_layout': 'maze_layout',
-        })
+        obs_mapping = dict(
+            obs_mapping,
+            **{
+                "agent_pos": "agent_pos",
+                "agent_dir": "agent_dir",
+                "targets_vec": "targets_vec",
+                "targets_pos": "targets_pos",
+                "target_vec": "target_vec",
+                "target_pos": "target_pos",
+                "maze_layout": "maze_layout",
+            }
+        )
 
     env = RemapObservationWrapper(env, obs_mapping)
 
@@ -136,17 +159,22 @@ def _memory_maze(
         env = DrawMinimapWrapper(env)
 
     if image_only_obs:
-        assert target_color_in_image, 'Image-only observation only makes sense with target_color_in_image'
+        assert (
+            target_color_in_image
+        ), "Image-only observation only makes sense with target_color_in_image"
         env = ImageOnlyObservationWrapper(env)
 
     if discrete_actions:
-        env = DiscreteActionSetWrapper(env, [
-            np.array([0.0, 0.0]),  # noop
-            np.array([-1.0, 0.0]),  # forward
-            np.array([0.0, -1.0]),  # left
-            np.array([0.0, +1.0]),  # right
-            np.array([-1.0, -1.0]),  # forward + left
-            np.array([-1.0, +1.0]),  # forward + right
-        ])
+        env = DiscreteActionSetWrapper(
+            env,
+            [
+                np.array([0.0, 0.0]),  # noop
+                np.array([-1.0, 0.0]),  # forward
+                np.array([0.0, -1.0]),  # left
+                np.array([0.0, +1.0]),  # right
+                np.array([-1.0, -1.0]),  # forward + left
+                np.array([-1.0, +1.0]),  # forward + right
+            ],
+        )
 
     return env
