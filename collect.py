@@ -5,6 +5,9 @@ from memory_maze import tasks
 import gym
 import numpy as np
 from tqdm import tqdm
+import os 
+
+os.environ['MUJOCO_GL'] = 'egl'
 
 
 env = tasks.memory_maze_9x9(
@@ -28,7 +31,7 @@ def main(unused_argv):
     max_steps = 1_000_000
     step = 0
 
-    while step < max_steps:
+    for step in tqdm(range(max_steps)):
         # Extract observation
         obs = {key: value.copy() for key, value in time_step.observation.items()}
         observations.append(obs)
@@ -43,8 +46,6 @@ def main(unused_argv):
         # Reset the environment if the episode ends
         if time_step.last():
             time_step = env.reset()
-
-        step += 1
 
     # Convert to NumPy arrays
     # Observations need to be handled as a structured array due to multiple keys
