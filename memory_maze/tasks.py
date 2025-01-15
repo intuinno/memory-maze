@@ -115,7 +115,7 @@ def _memory_maze(
     )
 
     obs_mapping = {
-        "image": "walker/egocentric_camera" if not top_camera else "top_camera",
+        "image": "walker/egocentric_camera",
         "target_color": "target_color",
     }
 

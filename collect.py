@@ -5,9 +5,9 @@ from memory_maze import tasks
 import gym
 import numpy as np
 from tqdm import tqdm
-import os 
+import os
 
-os.environ['MUJOCO_GL'] = 'egl'
+os.environ["MUJOCO_GL"] = "egl"
 
 
 env = tasks.memory_maze_9x9(
@@ -28,7 +28,7 @@ def main(unused_argv):
     actions = []
 
     # Run for 1 million steps
-    max_steps = 1_000_000
+    max_steps = 1_000
     step = 0
 
     for step in tqdm(range(max_steps)):
