@@ -28,8 +28,10 @@ def main(unused_argv):
     actions = []
 
     # Run for 1 million steps
-    max_steps = 1_000
+    max_steps = 10_000
     step = 0
+
+    action_spec = env.action_spec()
 
     for step in tqdm(range(max_steps)):
         # Extract observation
@@ -37,7 +39,7 @@ def main(unused_argv):
         observations.append(obs)
 
         # Take a random action
-        action = env.action_spec().generate_value()
+        action = np.random.randint(action_spec.minimum, action_spec.maximum + 1)
         actions.append(action)
 
         # Step the environment
