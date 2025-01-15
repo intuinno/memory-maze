@@ -1,5 +1,7 @@
 .*
 *.npz
+*.npy
+*.pkl
 !.gitignore
 
 __pycache__/

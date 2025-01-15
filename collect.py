@@ -28,7 +28,7 @@ def main(unused_argv):
     actions = []
 
     # Run for 1 million steps
-    max_steps = 10_000
+    max_steps = 100_000
     step = 0
 
     action_spec = env.action_spec()
