@@ -218,7 +218,6 @@ class CHMM(object):
             self.update_T()
             convergence.append(-log2_lik.mean())
             pbar.set_postfix(train_bps=convergence[-1])
-            print(it, convergence[-1])
             if log2_lik.mean() <= log2_lik_old:
                 if term_early:
                     break
