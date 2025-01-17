@@ -18,7 +18,7 @@ env = tasks._memory_maze(
     target_color_in_image=False,
     global_observables=True,
     top_camera=True,
-    good_visibility=True,
+    good_visibility=False,
     show_path=False,
     camera_resolution=64,
 )
@@ -58,4 +58,4 @@ obs_array = {key: np.array([obs[key] for obs in observations]) for key in obs_ke
 actions = np.array(actions)
 
 # Save to a .npz file
-np.savez("data/small_env_5_5_100k.npz", **obs_array, actions=actions)
+np.savez("data/small_env_5_5_3actions_100k.npz", **obs_array, actions=actions)
