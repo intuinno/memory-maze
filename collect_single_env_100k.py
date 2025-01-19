@@ -23,6 +23,20 @@ integral_error = 0.0
 previous_error = 0.0
 
 
+# Helper Function: Normalize angle to [-π, π]
+def normalize_to_pi(angle):
+    """
+    Normalize an angle to the range [-π, π].
+
+    :param angle: Angle in radians.
+    :return: Equivalent angle in the range [-π, π].
+    """
+    angle = angle % (2 * np.pi)  # Normalize to [0, 2π)
+    if angle > np.pi:
+        angle -= 2 * np.pi  # Convert [π, 2π) to [-π, π)
+    return angle
+
+
 class Orientation:
     def __init__(self, initial_orientation=0):
         self.angle = initial_orientation
@@ -35,9 +49,7 @@ class Orientation:
 
     def get_orientation(self):
         orient = self.angle % 4 * np.pi / 2
-        if orient > np.pi:
-            orient -= 2 * np.pi
-        return orient
+        return normalize_to_pi(orient)
 
 
 # PID Controller Function
@@ -46,7 +58,7 @@ def pid_control(current_angle, target_angle, dt):
     global integral_error, previous_error
 
     # Compute error
-    error = target_angle - current_angle
+    error = normalize_to_pi(target_angle - current_angle)
     integral_error += error * dt  # Accumulate error over time
     derivative_error = (error - previous_error) / dt  # Rate of change of error
     previous_error = error
@@ -128,7 +140,7 @@ for step in tqdm(range(max_steps)):
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
-            if abs(current_angle - target_angle) < 0.1:
+            if abs(normalize_to_pi(current_angle - target_angle)) < 0.1:
                 break
     elif action == 3:
         actions.append(3)
@@ -143,7 +155,7 @@ for step in tqdm(range(max_steps)):
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
-            if abs(current_angle - target_angle) < 0.1:
+            if abs(normalize_to_pi(current_angle - target_angle)) < 0.1:
                 break
 
     # Step the environment
