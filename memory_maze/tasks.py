@@ -54,7 +54,7 @@ def _memory_maze(
     max_rooms=6,
     room_min_size=3,
     room_max_size=5,
-    control_freq=DEFAULT_CONTROL_FREQ,
+    control_freq=1,
     discrete_actions=True,
     image_only_obs=False,
     target_color_in_image=True,
@@ -67,7 +67,7 @@ def _memory_maze(
     randomize_colors=False,
 ):
     random_state = np.random.RandomState(seed)
-    walker = RollingBallWithFriction(camera_height=0.3, add_ears=top_camera)
+    walker = RollingBallWithPositionControl(camera_height=0.3, add_ears=top_camera)
     arena = MazeWithTargetsArena(
         x_cells=maze_size + 2,  # inner size => outer size
         y_cells=maze_size + 2,
@@ -168,10 +168,12 @@ def _memory_maze(
         env = DiscreteActionSetWrapper(
             env,
             [
-                # np.array([0.0, 0.0]),  # noop
-                np.array([-1.0, 0.0]),  # forward
-                np.array([0.0, -1.0]),  # left
-                np.array([0.0, +1.0]),  # right
+                np.array([0.0, 0.0]),  # noop
+                np.array([-0.1, 0.0]),  # forward
+                np.array([0.0, -0.3]),  # left
+                np.array([0.0, 0.3]),  # right
+                # np.array([0.0, -1.0]),  # left
+                # np.array([0.0, +1.0]),  # right
                 # np.array([-1.0, -1.0]),  # forward + left
                 # np.array([-1.0, +1.0]),  # forward + right
             ],

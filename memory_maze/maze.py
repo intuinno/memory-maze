@@ -36,6 +36,42 @@ class RollingBallWithFriction(jumping_ball.RollingBallWithHead):
         self._mjcf_root.find("joint", "steer").damping = steer_damping
 
 
+class RollingBallWithPositionControl(jumping_ball.RollingBallWithHead):
+
+    def _build(self, roll_damping=5.0, steer_damping=20.0, **kwargs):
+        super()._build(**kwargs)
+        # Increase friction to the joints, so the movement feels more like traditional
+        # first-person navigation control, without much acceleration/deceleration.
+        self._mjcf_root.find("joint", "roll").damping = roll_damping
+        self._mjcf_root.find("joint", "steer").damping = steer_damping
+        # steer_motor = self._mjcf_root.find("actuator", "steer")
+        # # self._mjcf_root.actuator.remove(steer_motor)
+        # steer_joint = self._mjcf_root.find("joint", "steer")
+        # roll_joint = self._mjcf_root.find("joint", "roll")
+        # self._mjcf_root.actuator.add(
+        #     "general",
+        #     name="roll",
+        #     ctrllimited=True,
+        #     ctrlrange=[-1.0, 1.0],
+        #     gear="-50",
+        #     joint=roll_joint,
+        #     biastype="affine",
+        #     biasprm="0",
+        # )
+        # self._mjcf_root.actuator.add(
+        #     "position",
+        #     name="steer",
+        #     joint=steer_joint,
+        #     ctrllimited=True,
+        #     ctrlrange=[-1.57, 1.57],  # Allow steering from -90 to +90 degrees
+        #     kp="1000",
+        # )
+
+        # print(
+        #     "RollingBallWithPositionControl._build() steer changed from motor to position control"
+        # )
+
+
 class MemoryMazeTask(random_goal_maze.NullGoalMaze):
     # Adapted from dm_control.locomotion.tasks.RepeatSingleGoalMaze
 
@@ -57,7 +93,7 @@ class MemoryMazeTask(random_goal_maze.NullGoalMaze):
             walker=walker,
             maze_arena=maze_arena,
             randomize_spawn_position=True,
-            randomize_spawn_rotation=True,
+            randomize_spawn_rotation=False,
             contact_termination=False,
             enable_global_task_observables=enable_global_task_observables,
             physics_timestep=physics_timestep,
@@ -217,7 +253,7 @@ class MemoryMazeTask(random_goal_maze.NullGoalMaze):
         while True:
             ix = rng.randint(len(self._targets))
             # if self._targets[ix].activated:
-            #     continue  # Skip the target that the agent is touching
+            # continue  # Skip the target that the agent is touching
             self._current_target_ix = ix
             break
 
