@@ -15,8 +15,8 @@ os.environ["MUJOCO_GL"] = "egl"
 
 # PID Controller Parameters
 K_p = 10.0  # Proportional gain
-K_i = 0  # Integral gain
-K_d = 0  # Derivative gain
+K_i = 0.1  # Integral gain
+K_d = 0.1  # Derivative gain
 
 # Target and State Variables
 target_angle = np.pi / 2  # Target: 90 degrees (radians)
@@ -143,6 +143,7 @@ for step in tqdm(range(max_steps)):
         orient.turn_left()
         target_angle = orient.get_orientation()
         while True:
+            previous_angle = current_angle
             dt = env.control_timestep()
             action = pid_control(current_angle, target_angle, dt)
             sub_action.append(action)
@@ -154,12 +155,16 @@ for step in tqdm(range(max_steps)):
             current_angle = get_current_angle(time_step.observation["agent_dir"])
             if abs(normalize_to_pi(current_angle - target_angle)) < 0.1:
                 break
+            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.0001:
+                break
+
     elif action == 3:
         actions.append(3)
         current_angle = get_current_angle(obs["agent_dir"])
         orient.turn_right()
         target_angle = orient.get_orientation()
         while True:
+            previous_angle = current_angle
             dt = env.control_timestep()
             action = pid_control(current_angle, target_angle, dt)
             sub_action.append(action)
@@ -170,6 +175,8 @@ for step in tqdm(range(max_steps)):
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
             if abs(normalize_to_pi(current_angle - target_angle)) < 0.1:
+                break
+            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.0001:
                 break
 
     # Step the environment
