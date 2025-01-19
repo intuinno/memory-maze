@@ -134,7 +134,7 @@ for step in tqdm(range(max_steps)):
         actions.append(1)
         for k in [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
             sub_action.append(k)
-            time_step = env.step(0)
+            time_step = env.step(k)
             # obs = {key: value.copy() for key, value in time_step.observation.items()}
             # observations.append(obs)
     elif action == 2:
