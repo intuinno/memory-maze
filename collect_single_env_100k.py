@@ -7,6 +7,7 @@ import numpy as np
 from tqdm import tqdm
 import os
 from matplotlib import pyplot as plt
+import pickle
 
 np.random.seed(42)
 
@@ -14,13 +15,16 @@ os.environ["MUJOCO_GL"] = "egl"
 
 # PID Controller Parameters
 K_p = 10.0  # Proportional gain
-K_i = 0.5  # Integral gain
-K_d = 1.0  # Derivative gain
+K_i = 0  # Integral gain
+K_d = 0  # Derivative gain
 
 # Target and State Variables
 target_angle = np.pi / 2  # Target: 90 degrees (radians)
 integral_error = 0.0
 previous_error = 0.0
+
+# List to store error values
+error_values = []
 
 
 # Helper Function: Normalize angle to [-π, π]
@@ -63,6 +67,9 @@ def pid_control(current_angle, target_angle, dt):
     derivative_error = (error - previous_error) / dt  # Rate of change of error
     previous_error = error
 
+    # Store error value
+    error_values.append(error)
+
     # Compute raw PID control signal
     raw_control_signal = K_p * error + K_i * integral_error + K_d * derivative_error
 
@@ -102,9 +109,10 @@ time_step = env.reset()
 # Storage for observations and actions
 observations = []
 actions = []
+top_action = []
 
 # Run for 1 million steps
-max_steps = 1_000
+max_steps = 3000
 step = 0
 
 action_spec = env.action_spec()
@@ -118,15 +126,17 @@ for step in tqdm(range(max_steps)):
 
     # Take a random action
     action = np.random.randint(action_spec.minimum, action_spec.maximum + 1)
+    sub_action = []
 
     if action == 0:
         pass
     elif action == 1:
         actions.append(1)
-        time_step = env.step(1)
-        for k in range(5):
-            actions.append(0)
+        for k in [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
+            sub_action.append(k)
             time_step = env.step(0)
+            # obs = {key: value.copy() for key, value in time_step.observation.items()}
+            # observations.append(obs)
     elif action == 2:
         actions.append(2)
         current_angle = get_current_angle(obs["agent_dir"])
@@ -135,8 +145,10 @@ for step in tqdm(range(max_steps)):
         while True:
             dt = env.control_timestep()
             action = pid_control(current_angle, target_angle, dt)
-            # actions.append(action)
+            sub_action.append(action)
             time_step = env.step(action)
+            # obs = {key: value.copy() for key, value in time_step.observation.items()}
+            # observations.append(obs)
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
@@ -150,8 +162,10 @@ for step in tqdm(range(max_steps)):
         while True:
             dt = env.control_timestep()
             action = pid_control(current_angle, target_angle, dt)
-            # actions.append(action)
+            sub_action.append(action)
             time_step = env.step(action)
+            # obs = {key: value.copy() for key, value in time_step.observation.items()}
+            # observations.append(obs)
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
@@ -159,7 +173,8 @@ for step in tqdm(range(max_steps)):
                 break
 
     # Step the environment
-    time_step = env.step(action)
+    # time_step = env.step(action)
+    top_action.append({action: sub_action})
 
     # Reset the environment if the episode ends
     if time_step.last():
@@ -171,6 +186,24 @@ for step in tqdm(range(max_steps)):
 obs_keys = observations[0].keys()
 obs_array = {key: np.array([obs[key] for obs in observations]) for key in obs_keys}
 actions = np.array(actions)
+error_values = np.array(error_values)
 
 # Save to a .npz file
-np.savez("data/small_env_5_5_3actions_100k.npz", **obs_array, actions=actions)
+np.savez(
+    "data/small_env_5_5_3actions_100k.npz",
+    **obs_array,
+    actions=actions,
+    error_values=error_values,
+)
+
+# Save top_action as a pickle file
+with open("data/top_action.pkl", "wb") as f:
+    pickle.dump(top_action, f)
+
+# Plot the error signal over timesteps
+plt.figure()
+plt.plot(error_values)
+plt.xlabel("Timestep")
+plt.ylabel("Error")
+plt.title("PID Error Signal Over Time")
+plt.show()
