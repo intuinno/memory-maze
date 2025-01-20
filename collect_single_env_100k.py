@@ -110,7 +110,7 @@ env = tasks._memory_maze(
     top_camera=True,
     good_visibility=False,
     show_path=False,
-    camera_resolution=256,
+    camera_resolution=64,
     control_freq=4,
     seed=42,
 )
@@ -123,7 +123,7 @@ actions = []
 top_action = []
 
 # Run for 1 million steps
-max_steps = 1000
+max_steps = 100000
 step = 0
 
 action_spec = env.action_spec()
@@ -135,6 +135,8 @@ action_distribution = [1, 1, 2, 3]
 for step in tqdm(range(max_steps)):
     # Extract observation
     obs = {key: value.copy() for key, value in time_step.observation.items()}
+    obs['orientation'] = orient.angle 
+
     observations.append(obs)
 
     current_pos = obs["agent_pos"]
@@ -246,30 +248,30 @@ error_values = np.array(error_values)
 
 # Save to a .npz file
 np.savez(
-    "data/small_env_5_5_3actions_100k.npz",
+    "data/small_env_5_5_3actions_100k_low_orient.npz",
     **obs_array,
     actions=actions,
     error_values=error_values,
 )
 
 # Save top_action as a pickle file
-with open("data/top_action.pkl", "wb") as f:
+with open("data/top_action_100k_orient.pkl", "wb") as f:
     pickle.dump(top_action, f)
 
 # Plot the error signal over timesteps
-plt.figure()
-plt.plot(error_values)
-plt.xlabel("Timestep")
-plt.ylabel("Error")
-plt.title("PID Error Signal Over Time")
-plt.show()
-
-# Plot the trajectory using obs['agent_pos']
-agent_positions = np.array([obs["agent_pos"] for obs in observations])
-
-plt.figure()
-plt.plot(agent_positions[:, 0], agent_positions[:, 1], marker="o")
-plt.xlabel("X Position")
-plt.ylabel("Y Position")
-plt.title("Agent Trajectory")
-plt.show()
+# plt.figure()
+# plt.plot(error_values)
+# plt.xlabel("Timestep")
+# plt.ylabel("Error")
+# plt.title("PID Error Signal Over Time")
+# plt.show()
+# 
+# # Plot the trajectory using obs['agent_pos']
+# agent_positions = np.array([obs["agent_pos"] for obs in observations])
+# 
+# plt.figure()
+# plt.plot(agent_positions[:, 0], agent_positions[:, 1], marker="o")
+# plt.xlabel("X Position")
+# plt.ylabel("Y Position")
+# plt.title("Agent Trajectory")
+# plt.show()
