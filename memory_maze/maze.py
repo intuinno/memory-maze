@@ -28,7 +28,7 @@ TARGET_COLORS = [
 
 class RollingBallWithFriction(jumping_ball.RollingBallWithHead):
 
-    def _build(self, roll_damping=5.0, steer_damping=20.0, **kwargs):
+    def _build(self, roll_damping=50.0, steer_damping=20.0, **kwargs):
         super()._build(**kwargs)
         # Increase friction to the joints, so the movement feels more like traditional
         # first-person navigation control, without much acceleration/deceleration.

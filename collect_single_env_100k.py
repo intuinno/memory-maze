@@ -15,8 +15,8 @@ os.environ["MUJOCO_GL"] = "egl"
 
 # PID Controller Parameters
 K_p = 10.0  # Proportional gain
-K_i = 0.1  # Integral gain
-K_d = 0.1  # Derivative gain
+K_i = 0.0  # Integral gain
+K_d = 0.0  # Derivative gain
 
 # Target and State Variables
 target_angle = np.pi / 2  # Target: 90 degrees (radians)
@@ -89,6 +89,17 @@ def get_current_angle(agent_dir):
     return current_angle
 
 
+def get_distance(pos1, pos2):
+    """
+    Calculate the Euclidean distance between two positions.
+
+    :param pos1: First position (x, y).
+    :param pos2: Second position (x, y).
+    :return: Euclidean distance between pos1 and pos2.
+    """
+    return np.linalg.norm(np.array(pos1) - np.array(pos2))
+
+
 env = tasks._memory_maze(
     5,  # Maze size
     1,  # n_targets
@@ -119,22 +130,32 @@ action_spec = env.action_spec()
 
 orient = Orientation(0)
 
+action_distribution = [1, 1, 2, 3]
+
 for step in tqdm(range(max_steps)):
     # Extract observation
     obs = {key: value.copy() for key, value in time_step.observation.items()}
     observations.append(obs)
 
+    current_pos = obs["agent_pos"]
+
     # Take a random action
-    action = np.random.randint(action_spec.minimum, action_spec.maximum + 1)
+    # action = np.random.randint(action_spec.minimum, action_spec.maximum + 1)
+    # action = determine_action[step]
+    action = np.random.choice(action_distribution)
+
     sub_action = []
 
     if action == 0:
         pass
     elif action == 1:
         actions.append(1)
-        for k in [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
+        for k in range(1):
             sub_action.append(k)
-            time_step = env.step(k)
+            time_step = env.step(1)
+        for k in range(3):
+            sub_action.append(k)
+            time_step = env.step(0)
             # obs = {key: value.copy() for key, value in time_step.observation.items()}
             # observations.append(obs)
     elif action == 2:
@@ -153,9 +174,9 @@ for step in tqdm(range(max_steps)):
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
-            if abs(normalize_to_pi(current_angle - target_angle)) < 0.1:
+            if abs(normalize_to_pi(current_angle - target_angle)) < 0.01:
                 break
-            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.0001:
+            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.05:
                 break
 
     elif action == 3:
@@ -174,9 +195,9 @@ for step in tqdm(range(max_steps)):
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
-            if abs(normalize_to_pi(current_angle - target_angle)) < 0.1:
+            if abs(normalize_to_pi(current_angle - target_angle)) < 0.01:
                 break
-            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.0001:
+            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.05:
                 break
 
     # Step the environment
@@ -186,6 +207,11 @@ for step in tqdm(range(max_steps)):
     # Reset the environment if the episode ends
     if time_step.last():
         time_step = env.reset()
+
+    if get_distance(current_pos, time_step.observation["agent_pos"]) < 0.1:
+        action_distribution = [2, 3]
+    else:
+        action_distribution = [1, 1, 2, 3]
 
 
 # Convert to NumPy arrays
@@ -208,9 +234,19 @@ with open("data/top_action.pkl", "wb") as f:
     pickle.dump(top_action, f)
 
 # Plot the error signal over timesteps
+# plt.figure()
+# plt.plot(error_values)
+# plt.xlabel("Timestep")
+# plt.ylabel("Error")
+# plt.title("PID Error Signal Over Time")
+# plt.show()
+
+# Plot the trajectory using obs['agent_pos']
+agent_positions = np.array([obs["agent_pos"] for obs in observations])
+
 plt.figure()
-plt.plot(error_values)
-plt.xlabel("Timestep")
-plt.ylabel("Error")
-plt.title("PID Error Signal Over Time")
+plt.plot(agent_positions[:, 0], agent_positions[:, 1], marker="o")
+plt.xlabel("X Position")
+plt.ylabel("Y Position")
+plt.title("Agent Trajectory")
 plt.show()
