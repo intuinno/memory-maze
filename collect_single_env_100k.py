@@ -123,7 +123,7 @@ actions = []
 top_action = []
 
 # Run for 1 million steps
-max_steps = 3000
+max_steps = 1000
 step = 0
 
 action_spec = env.action_spec()
@@ -166,17 +166,27 @@ for step in tqdm(range(max_steps)):
         while True:
             previous_angle = current_angle
             dt = env.control_timestep()
-            action = pid_control(current_angle, target_angle, dt)
-            sub_action.append(action)
-            time_step = env.step(action)
+            s_action = pid_control(current_angle, target_angle, dt)
+            sub_action.append(s_action)
+            time_step = env.step(s_action)
             # obs = {key: value.copy() for key, value in time_step.observation.items()}
             # observations.append(obs)
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
-            if abs(normalize_to_pi(current_angle - target_angle)) < 0.01:
+            if abs(normalize_to_pi(current_angle - target_angle)) < 0.05:
                 break
-            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.05:
+            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.01:
+                break
+            elif len(sub_action) > 100:
+                print(
+                    "Timeout at",
+                    step,
+                    action,
+                    sub_action,
+                    previous_angle,
+                    current_angle,
+                )
                 break
 
     elif action == 3:
@@ -187,17 +197,27 @@ for step in tqdm(range(max_steps)):
         while True:
             previous_angle = current_angle
             dt = env.control_timestep()
-            action = pid_control(current_angle, target_angle, dt)
-            sub_action.append(action)
-            time_step = env.step(action)
+            s_action = pid_control(current_angle, target_angle, dt)
+            sub_action.append(s_action)
+            time_step = env.step(s_action)
             # obs = {key: value.copy() for key, value in time_step.observation.items()}
             # observations.append(obs)
             if time_step.last():
                 break
             current_angle = get_current_angle(time_step.observation["agent_dir"])
-            if abs(normalize_to_pi(current_angle - target_angle)) < 0.01:
+            if abs(normalize_to_pi(current_angle - target_angle)) < 0.05:
                 break
-            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.05:
+            elif abs(normalize_to_pi(previous_angle - current_angle)) < 0.01:
+                break
+            elif len(sub_action) > 100:
+                print(
+                    "Timeout at",
+                    step,
+                    action,
+                    sub_action,
+                    previous_angle,
+                    current_angle,
+                )
                 break
 
     # Step the environment
@@ -208,7 +228,10 @@ for step in tqdm(range(max_steps)):
     if time_step.last():
         time_step = env.reset()
 
-    if get_distance(current_pos, time_step.observation["agent_pos"]) < 0.1:
+    if (
+        action == 1
+        and get_distance(current_pos, time_step.observation["agent_pos"]) < 0.1
+    ):
         action_distribution = [2, 3]
     else:
         action_distribution = [1, 1, 2, 3]
@@ -234,12 +257,12 @@ with open("data/top_action.pkl", "wb") as f:
     pickle.dump(top_action, f)
 
 # Plot the error signal over timesteps
-# plt.figure()
-# plt.plot(error_values)
-# plt.xlabel("Timestep")
-# plt.ylabel("Error")
-# plt.title("PID Error Signal Over Time")
-# plt.show()
+plt.figure()
+plt.plot(error_values)
+plt.xlabel("Timestep")
+plt.ylabel("Error")
+plt.title("PID Error Signal Over Time")
+plt.show()
 
 # Plot the trajectory using obs['agent_pos']
 agent_positions = np.array([obs["agent_pos"] for obs in observations])
