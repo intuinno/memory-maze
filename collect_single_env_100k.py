@@ -1,6 +1,6 @@
 from absl import app
 
-from dm_control import viewer
+# from dm_control import viewer
 from memory_maze import tasks
 import gym
 import numpy as np
@@ -123,7 +123,7 @@ actions = []
 top_action = []
 
 # Run for 1 million steps
-max_steps = 100000
+max_steps = 1000
 step = 0
 
 action_spec = env.action_spec()
@@ -248,14 +248,14 @@ error_values = np.array(error_values)
 
 # Save to a .npz file
 np.savez(
-    "data/small_env_5_5_3actions_100k_low_orient.npz",
+    "data/small_env_5_5_3actions_1k_low_orient.npz",
     **obs_array,
     actions=actions,
     error_values=error_values,
 )
 
 # Save top_action as a pickle file
-with open("data/top_action_100k_orient.pkl", "wb") as f:
+with open("data/top_action_1k_orient.pkl", "wb") as f:
     pickle.dump(top_action, f)
 
 # Plot the error signal over timesteps
